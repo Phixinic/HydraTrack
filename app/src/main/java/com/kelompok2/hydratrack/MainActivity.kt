@@ -337,6 +337,13 @@ fun RingkasanCard(totalMl: Int, jumlahCatatan: Int, targetHarian: Int, progres: 
                     .height(8.dp)
             )
             Text(text = "Progres: $progres%", fontWeight = FontWeight.SemiBold)
+            val sisa = hitungSisa(totalMl, targetHarian)
+            if (sisa > 0) {
+                Text(
+                    text = "Kurang $sisa mL lagi menuju target",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Text(text = pesanProgres(progres), style = MaterialTheme.typography.bodyMedium)
         }
     }

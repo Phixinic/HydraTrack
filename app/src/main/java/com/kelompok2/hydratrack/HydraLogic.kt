@@ -61,3 +61,7 @@ fun hitungRataRata(daftar: List<CatatanMinum>): Int {
     if (daftar.isEmpty()) return 0
     return hitungTotal(daftar) / daftar.size
 }
+
+fun hitungSisa(total: Int, target: Int): Int {
+    return (target - total).coerceAtLeast(0)
+}
