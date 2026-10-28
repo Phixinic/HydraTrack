@@ -60,27 +60,28 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HydraTrackScreen(modifier: Modifier = Modifier) {
-    // ===== 1. STATE FORMULIR =====
+    // 1. STATE FORMULIR
     var waktu by remember { mutableStateOf("") }
     var jumlah by remember { mutableStateOf("") }
     var jenis by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("2000") }
     var catatan by remember { mutableStateOf("") }
 
-    // ===== 2. STATE PESAN ERROR (null = tidak ada error) =====
+    // 2. STATE PESAN ERROR
     var errorWaktu by remember { mutableStateOf<String?>(null) }
     var errorJumlah by remember { mutableStateOf<String?>(null) }
     var errorJenis by remember { mutableStateOf<String?>(null) }
     var errorTarget by remember { mutableStateOf<String?>(null) }
 
-    // ===== 3. STATE DATA =====
+    // 3. STATE DATA
     val daftarCatatan = remember { mutableStateListOf<CatatanMinum>() }
     var targetHarian by remember { mutableIntStateOf(2000) }
     var idBerikutnya by remember { mutableIntStateOf(1) }
 
-    // ===== 4. RINGKASAN (otomatis dihitung ulang saat data berubah) =====
+    // 4. RINGKASAN
     val totalMl = hitungTotal(daftarCatatan)
     val progres = hitungProgres(totalMl, targetHarian)
+    val rataRata = hitungRataRata(daftarCatatan)
 
     fun kosongkanError() {
         errorWaktu = null
@@ -126,7 +127,7 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
         catatan = ""
     }
 
-    // ===== 5. TAMPILAN (satu LazyColumn agar seluruh layar bisa di-scroll) =====
+    // 5. TAMPILAN
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -134,7 +135,7 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
     ) {
         item { HeaderSection() }
 
-        // --- Formulir ---
+        // Formulir
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -235,17 +236,18 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // --- Ringkasan ---
+        // Ringkasan
         item {
             RingkasanCard(
                 totalMl = totalMl,
                 jumlahCatatan = daftarCatatan.size,
                 targetHarian = targetHarian,
-                progres = progres
+                progres = progres,
+                rataRata = rataRata
             )
         }
 
-        // --- Riwayat ---
+        // Riwayat
         item {
             Text(
                 text = "Riwayat Minum",
@@ -264,7 +266,7 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
     }
 }
 
-// ===== KOMPONEN-KOMPONEN KECIL =====
+// KOMPONEN-KOMPONEN KECIL
 
 @Composable
 fun HeaderSection() {
@@ -300,7 +302,7 @@ fun PesanError(pesan: String?) {
 }
 
 @Composable
-fun RingkasanCard(totalMl: Int, jumlahCatatan: Int, targetHarian: Int, progres: Int) {
+fun RingkasanCard(totalMl: Int, jumlahCatatan: Int, targetHarian: Int, progres: Int, rataRata: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -324,6 +326,10 @@ fun RingkasanCard(totalMl: Int, jumlahCatatan: Int, targetHarian: Int, progres: 
                 ItemRingkasan(label = "Minum", nilai = "$jumlahCatatan kali")
                 ItemRingkasan(label = "Target", nilai = "$targetHarian mL")
             }
+            Text(
+                text = "Rata-rata per minum: $rataRata mL",
+                style = MaterialTheme.typography.bodyMedium
+            )
             LinearProgressIndicator(
                 progress = { (progres / 100f).coerceAtMost(1f) },
                 modifier = Modifier

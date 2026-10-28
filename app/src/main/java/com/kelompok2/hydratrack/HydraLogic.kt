@@ -1,6 +1,5 @@
 package com.kelompok2.hydratrack
 
-// Batas wajar untuk tugas (bukan standar medis)
 object HydraRules {
     const val MIN_ML = 1
     const val MAX_ML = 2000
@@ -9,9 +8,6 @@ object HydraRules {
 }
 
 val daftarJenisMinuman = listOf("Air putih", "Teh", "Jus", "Susu", "Lainnya")
-
-// ===== VALIDASI =====
-// Mengembalikan pesan error, atau null kalau input valid
 
 fun validasiWaktu(input: String): String? {
     if (input.isBlank()) return "Waktu minum wajib diisi"
@@ -41,7 +37,7 @@ fun validasiTarget(input: String): String? {
     return null
 }
 
-// ===== PERHITUNGAN & RINGKASAN =====
+// PERHITUNGAN & RINGKASAN
 
 fun hitungTotal(daftar: List<CatatanMinum>): Int {
     return daftar.sumOf { it.jumlahMl }
@@ -59,4 +55,9 @@ fun pesanProgres(persen: Int): String {
         persen < 100 -> "Sudah lebih dari setengah target, lanjutkan!"
         else -> "Target pribadi hari ini tercapai! 🎉"
     }
+}
+
+fun hitungRataRata(daftar: List<CatatanMinum>): Int {
+    if (daftar.isEmpty()) return 0
+    return hitungTotal(daftar) / daftar.size
 }
