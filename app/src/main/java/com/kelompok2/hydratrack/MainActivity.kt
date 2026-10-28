@@ -1,5 +1,6 @@
 package com.kelompok2.hydratrack
 
+import android.app.TimePickerDialog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,12 +38,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kelompok2.hydratrack.ui.theme.HydraTrackTheme
+import java.util.Calendar
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,9 +83,36 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
     var idBerikutnya by remember { mutableIntStateOf(1) }
 
     // 4. RINGKASAN
+    val context = LocalContext.current
     val totalMl = hitungTotal(daftarCatatan)
     val progres = hitungProgres(totalMl, targetHarian)
     val rataRata = hitungRataRata(daftarCatatan)
+
+    fun setJamSaatIni() {
+        val calendar = Calendar.getInstance()
+        val jam = calendar.get(Calendar.HOUR_OF_DAY)
+        val menit = calendar.get(Calendar.MINUTE)
+        waktu = String.format(Locale.getDefault(), "%02d:%02d", jam, menit)
+        errorWaktu = null
+    }
+
+    fun bukaTimePicker() {
+        val calendar = Calendar.getInstance()
+        val parts = waktu.split(":")
+        val jamAwal = if (parts.size == 2) parts[0].toIntOrNull() ?: calendar.get(Calendar.HOUR_OF_DAY) else calendar.get(Calendar.HOUR_OF_DAY)
+        val menitAwal = if (parts.size == 2) parts[1].toIntOrNull() ?: calendar.get(Calendar.MINUTE) else calendar.get(Calendar.MINUTE)
+
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                waktu = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
+                errorWaktu = null
+            },
+            jamAwal,
+            menitAwal,
+            true
+        ).show()
+    }
 
     fun kosongkanError() {
         errorWaktu = null
@@ -160,6 +191,25 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { setJamSaatIni() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Jam Saat Ini")
+                        }
+
+                        OutlinedButton(
+                            onClick = { bukaTimePicker() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Pilih Jam")
+                        }
+                    }
                     PesanError(errorWaktu)
 
                     OutlinedTextField(
