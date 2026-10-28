@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +54,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            HydraTrackTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HydraTrackScreen(modifier = Modifier.padding(innerPadding))
+            var isDarkTheme by rememberSaveable {
+                mutableStateOf(false)
+            }
+
+            HydraTrackTheme(
+                darkTheme = isDarkTheme
+            ) {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    HydraTrackScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        isDarkTheme = isDarkTheme,
+                        onThemeChange = { pilihan ->
+                            isDarkTheme = pilihan
+                        }
+                    )
                 }
             }
         }
@@ -63,7 +80,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HydraTrackScreen(modifier: Modifier = Modifier) {
+fun HydraTrackScreen(
+    modifier: Modifier = Modifier,
+    isDarkTheme: Boolean = false,
+    onThemeChange: (Boolean) -> Unit = {}
+) {
     // 1. STATE FORMULIR
     var waktu by remember { mutableStateOf("") }
     var jumlah by remember { mutableStateOf("") }
@@ -164,7 +185,7 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item { HeaderSection() }
+        item { HeaderSection(isDarkTheme = isDarkTheme, onThemeChange = onThemeChange) }
 
         // Formulir
         item {
@@ -319,14 +340,34 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
 // KOMPONEN-KOMPONEN KECIL
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(
+    isDarkTheme: Boolean = false,
+    onThemeChange: (Boolean) -> Unit = {}
+) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = "💧 HydraTrack",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "💧 HydraTrack",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = if (isDarkTheme) "🌙 Dark" else "☀️ Light",
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = onThemeChange
+                )
+            }
+        }
         Text(
             text = "Catat konsumsi air harianmu dan pantau progres menuju target pribadi.",
             style = MaterialTheme.typography.bodyMedium
