@@ -149,7 +149,10 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
 
                     OutlinedTextField(
                         value = waktu,
-                        onValueChange = { waktu = it },
+                        onValueChange = {
+                            waktu = it
+                            errorWaktu = null
+                        },
                         label = { Text("Waktu minum (JJ:MM)") },
                         placeholder = { Text("08:30") },
                         isError = errorWaktu != null,
@@ -177,7 +180,10 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
                                 .fillMaxWidth()
                                 .selectable(
                                     selected = jenis == pilihan,
-                                    onClick = { jenis = pilihan },
+                                    onClick = {
+                                        jenis = pilihan
+                                        errorJenis = null
+                                    },
                                     role = Role.RadioButton
                                 )
                                 .padding(vertical = 2.dp),
@@ -192,7 +198,10 @@ fun HydraTrackScreen(modifier: Modifier = Modifier) {
 
                     OutlinedTextField(
                         value = target,
-                        onValueChange = { target = it },
+                        onValueChange = {
+                            target = it
+                            errorTarget = null
+                        },
                         label = { Text("Target pribadi harian (mL)") },
                         isError = errorTarget != null,
                         singleLine = true,
