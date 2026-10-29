@@ -27,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -81,22 +82,6 @@ private val HydraTrackDarkColors = darkColorScheme(
     surfaceVariant = Color(0xFF263B4C),
     onSurfaceVariant = Color(0xFFC0D5E4),
     outline = Color(0xFF466276)
-)
-
-private data class HydraTrackRecord(
-    val id: Int,
-    val waktu: String,
-    val jumlahMl: Int,
-    val jenisMinuman: String,
-    val catatan: String
-)
-
-private val hydraDrinkTypes = listOf(
-    "Air putih",
-    "Teh",
-    "Susu",
-    "Jus",
-    "Lainnya"
 )
 
 class MainActivity : ComponentActivity() {
@@ -155,7 +140,7 @@ fun HydraTrackScreen(
     var errorTarget by remember { mutableStateOf<String?>(null) }
 
     val daftarCatatan = remember {
-        mutableStateListOf<HydraTrackRecord>()
+        mutableStateListOf<CatatanMinum>()
     }
 
     var targetHarian by rememberSaveable {
@@ -168,14 +153,10 @@ fun HydraTrackScreen(
 
     val context = LocalContext.current
 
-    val totalMl = daftarCatatan.sumOf { it.jumlahMl }
+    // Ringkasan: semua rumus diambil dari HydraLogic.kt
+    val totalMl = hitungTotal(daftarCatatan)
     val jumlahAktivitas = daftarCatatan.size
-
-    val rataRata = if (jumlahAktivitas > 0) {
-        totalMl / jumlahAktivitas
-    } else {
-        0
-    }
+    val rataRata = hitungRataRata(daftarCatatan)
 
     fun setJamSaatIni() {
         val calendar = Calendar.getInstance()
@@ -225,53 +206,10 @@ fun HydraTrackScreen(
         ).show()
     }
 
-    fun validasiWaktu(value: String): String? {
-        if (value.isBlank()) {
-            return "Waktu minum wajib diisi."
-        }
+    // Validasi memakai fungsi di HydraLogic.kt (validasiWaktu, validasiJumlah, dst.)
 
-        val polaWaktu = Regex(
-            "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
-        )
-
-        if (!polaWaktu.matches(value.trim())) {
-            return "Gunakan format jam HH:MM, contoh 08:30."
-        }
-
-        return null
-    }
-
-    fun validasiJumlah(value: String): String? {
-        val angka = value.trim().toIntOrNull()
-            ?: return "Jumlah air harus berupa angka."
-
-        if (angka !in 1..5000) {
-            return "Jumlah air harus antara 1 sampai 5000 mL."
-        }
-
-        return null
-    }
-
-    fun validasiJenis(value: String): String? {
-        if (value.isBlank()) {
-            return "Silakan pilih jenis minuman."
-        }
-
-        return null
-    }
-
-    fun validasiTarget(value: String): String? {
-        val angka = value.trim().toIntOrNull()
-            ?: return "Target harus berupa angka."
-
-        if (angka !in 250..10000) {
-            return "Target harus antara 250 sampai 10000 mL."
-        }
-
-        return null
-    }
-
-    fun resetForm() {
+    // Dipakai setelah data berhasil ditambah: form kosong, target tetap
+    fun kosongkanForm() {
         waktu = ""
         jumlah = ""
         jenis = ""
@@ -281,6 +219,14 @@ fun HydraTrackScreen(
         errorWaktu = null
         errorJumlah = null
         errorJenis = null
+    }
+
+    // Dipakai tombol Reset: semua kembali ke kondisi awal, termasuk target
+    fun resetForm() {
+        kosongkanForm()
+        target = "2000"
+        targetHarian = 2000
+        errorTarget = null
     }
 
     fun tambahCatatan() {
@@ -303,7 +249,7 @@ fun HydraTrackScreen(
         val targetAngka = target.trim().toIntOrNull()
             ?: return
 
-        val catatanBaru = HydraTrackRecord(
+        val catatanBaru = CatatanMinum(
             id = idBerikutnya,
             waktu = waktu.trim(),
             jumlahMl = jumlahAngka,
@@ -316,7 +262,7 @@ fun HydraTrackScreen(
 
         targetHarian = targetAngka
 
-        resetForm()
+        kosongkanForm()
     }
 
     LazyColumn(
@@ -340,7 +286,7 @@ fun HydraTrackScreen(
 
                     val angka = nilai.trim().toIntOrNull()
 
-                    if (angka != null && angka in 250..10000) {
+                    if (angka != null && angka in HydraRules.MIN_TARGET..HydraRules.MAX_TARGET) {
                         targetHarian = angka
                     }
                 },
@@ -373,7 +319,7 @@ fun HydraTrackScreen(
                             waktu = it
                             errorWaktu = null
                         },
-                        label = { Text("Waktu minum (HH:MM)") },
+                        label = { Text("Waktu minum (JJ:MM)") },
                         placeholder = { Text("08:30") },
                         isError = errorWaktu != null,
                         singleLine = true,
@@ -447,7 +393,7 @@ fun HydraTrackScreen(
                         fontWeight = FontWeight.Medium
                     )
 
-                    hydraDrinkTypes.forEach { pilihan ->
+                    daftarJenisMinuman.forEach { pilihan ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -500,7 +446,7 @@ fun HydraTrackScreen(
                             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                         )
 
                         ExposedDropdownMenu(
@@ -641,9 +587,7 @@ private fun HydraTargetProgressCard(
     totalMl: Int,
     targetHarian: Int
 ) {
-    val progresAktual = (
-            totalMl.toLong() * 100 / targetHarian
-            ).toInt()
+    val progresAktual = hitungProgres(totalMl, targetHarian)
 
     val progresBar = (
             totalMl.toFloat() / targetHarian
@@ -698,6 +642,12 @@ private fun HydraTargetProgressCard(
                 text = "$progresAktual% dari target",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = pesanProgres(progresAktual),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -757,7 +707,7 @@ private fun HydraSummaryCard(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            val sisa = (targetHarian - totalMl).coerceAtLeast(0)
+            val sisa = hitungSisa(totalMl, targetHarian)
 
             Text(
                 text = if (sisa > 0) {
@@ -794,7 +744,7 @@ private fun HydraSummaryItem(
 }
 
 @Composable
-private fun HydraRecordCard(item: HydraTrackRecord) {
+private fun HydraRecordCard(item: CatatanMinum) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
