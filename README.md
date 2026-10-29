@@ -97,7 +97,7 @@ Wireframe: [docs/wireframe.png](docs/wireframe.png)
 
 ## Hasil Pengujian
 
-Lihat [docs/test-cases.md](docs/test-cases.md). Ringkasan: [isi, contoh: 12 dari 12 skenario lulus].
+Lihat [docs/test-cases.md](docs/test-cases.md). Ringkasan: 10 dari 10 skenario sesuai.
 
 ## Batasan UTS
 
