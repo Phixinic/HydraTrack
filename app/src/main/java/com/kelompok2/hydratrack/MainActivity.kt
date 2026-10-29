@@ -1,4 +1,3 @@
-
 package com.kelompok2.hydratrack
 
 import android.app.TimePickerDialog
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
@@ -409,6 +409,28 @@ fun HydraTrackScreen(
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    val pilihanCepat = listOf("50", "100", "200", "250", "300", "500")
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(pilihanCepat) { volume ->
+                            OutlinedButton(
+                                onClick = {
+                                    jumlah = volume
+                                    errorJumlah = null
+                                }
+                            ) {
+                                Text("$volume mL")
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     HydraErrorText(errorJumlah)
 
