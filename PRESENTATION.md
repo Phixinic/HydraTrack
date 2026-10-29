@@ -2,7 +2,7 @@
 
 Durasi total sekitar 10–12 menit.
 
-## 1. Masalah, pengguna, dan batasan (2 menit) — [Anggota 2]
+## 1. Masalah, pengguna, dan batasan (2 menit) — Lucas Vincent Kurniawan Obedius Nobel
 
 - Masalah: orang sibuk mudah lupa minum dan tidak tahu sudah minum berapa banyak.
 - Pengguna: mahasiswa, pekerja, masyarakat umum.

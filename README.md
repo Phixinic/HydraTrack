@@ -7,10 +7,10 @@ Bagian dari payung proyek **HealthTrack Mobile Suite**.
 
 ## Anggota Kelompok
 
-| NIM       | Nama                | Peran utama                                                      |
-| --------- | ------------------- | ---------------------------------------------------------------- |
-| 322410004 | Farid Heka Magfirio | Kerangka aplikasi, model data, logika & validasi, refactor       |
-| 322410010 | [Nama Anggota 2]    | UI Jetpack Compose, tema gelap/cerah, input waktu, pilihan cepat |
+| NIM       | Nama                                  | Peran utama                                                      |
+| --------- | ------------------------------------- | ---------------------------------------------------------------- |
+| 322410004 | Farid Heka Magfirio                   | Kerangka aplikasi, model data, logika & validasi, refactor       |
+| 322410010 | Lucas Vincent Kurniawan Obedius Nobel | UI Jetpack Compose, tema gelap/cerah, input waktu, pilihan cepat |
 
 ## Masalah
 
@@ -89,9 +89,9 @@ Atau pasang langsung file APK `UTS_PemrogramanBergerak_HT-02_HydraTrack.apk`.
 
 ## Screenshot
 
-| Tampilan awal                         | Validasi error                          | Data terisi                           |
-| ------------------------------------- | --------------------------------------- | ------------------------------------- |
-| ![awal](docs/screenshots/01-awal.png) | ![error](docs/screenshots/02-error.png) | ![data](docs/screenshots/03-data.png) |
+| Tampilan awal                        | Validasi error                         | Data terisi                          | Tema gelap                             |
+| ------------------------------------ | -------------------------------------- | ------------------------------------ | -------------------------------------- |
+| ![awal](docs/screenshot/1-awal.jpeg) | ![error](docs/screenshot/2-error.jpeg) | ![data](docs/screenshot/3-data.jpeg) | ![gelap](docs/screenshot/4-gelap.jpeg) |
 
 Wireframe: [docs/wireframe.png](docs/wireframe.png)
 
