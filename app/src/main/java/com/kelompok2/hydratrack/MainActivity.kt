@@ -23,6 +23,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -131,6 +135,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HydraTrackScreen(
     modifier: Modifier = Modifier,
@@ -142,6 +147,7 @@ fun HydraTrackScreen(
     var jenis by remember { mutableStateOf("") }
     var target by rememberSaveable { mutableStateOf("2000") }
     var catatan by remember { mutableStateOf("") }
+    var expandedCatatan by remember { mutableStateOf(false) }
 
     var errorWaktu by remember { mutableStateOf<String?>(null) }
     var errorJumlah by remember { mutableStateOf<String?>(null) }
@@ -270,6 +276,7 @@ fun HydraTrackScreen(
         jumlah = ""
         jenis = ""
         catatan = ""
+        expandedCatatan = false
 
         errorWaktu = null
         errorJumlah = null
@@ -471,19 +478,46 @@ fun HydraTrackScreen(
 
                     HydraErrorText(errorJenis)
 
-                    OutlinedTextField(
-                        value = catatan,
-                        onValueChange = {
-                            if (it.length <= 100) {
-                                catatan = it
-                            }
-                        },
-                        label = { Text("Catatan (opsional)") },
-                        placeholder = {
-                            Text("Contoh: setelah beraktivitas")
-                        },
+                    val pilihanCatatanCepat = listOf("Bangun tidur", "Setelah olahraga", "Habis makan", "Cuaca panas", "Sebelum tidur")
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedCatatan,
+                        onExpandedChange = { expandedCatatan = it },
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        OutlinedTextField(
+                            value = catatan,
+                            onValueChange = {
+                                if (it.length <= 100) {
+                                    catatan = it
+                                }
+                            },
+                            label = { Text("Catatan (opsional)") },
+                            placeholder = { Text("Ketik atau pilih dari daftar") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCatatan)
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandedCatatan,
+                            onDismissRequest = { expandedCatatan = false }
+                        ) {
+                            pilihanCatatanCepat.forEach { teksCatatan ->
+                                DropdownMenuItem(
+                                    text = { Text(teksCatatan) },
+                                    onClick = {
+                                        catatan = teksCatatan
+                                        expandedCatatan = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     Text(
                         text = "${catatan.length}/100 karakter",
